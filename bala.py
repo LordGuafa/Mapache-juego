@@ -4,7 +4,7 @@ import opciones as opt
 import pygame
 
 # Carga imágenes
-imgBala = pygame.image.load('img\Balas/0.png').convert_alpha()
+imgBala = pygame.image.load('img\Balas/Cotton/0.png').convert_alpha()
 imgBala = pygame.transform.scale(
     imgBala, ((imgBala.get_width() * opt.ESCALA), (imgBala.get_height() * opt.ESCALA)))
 
@@ -26,4 +26,4 @@ class Bala(pygame.sprite.Sprite):
 
         # Verifica que la si la bala sale de la pantalla
         if self.rect.right < 0 or self.rect.left > opt.SCREEN_WIDTH:
-            self.kill()
+            self.kill

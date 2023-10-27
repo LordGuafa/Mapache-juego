@@ -2,8 +2,8 @@ import pygame
 import pantalla as pan
 import opciones as opt
 from entidades import Entidad
+from entidades import grupoBalas as grupoBalas
 import background as bg
-from bala import Bala
 # from cotton import Cotton
 pygame.init()
 
@@ -20,12 +20,9 @@ dispara = False
 clock = pygame.time.Clock()
 
 
-# Creación de grupos de balas
-grupoBalas = pygame.sprite.Group()
-
-
 # Creación del jugador
 cotton = Entidad('Cotton')
+enemigo = Entidad('Chocoso')
 
 # Bucle principal del juego
 run = True
@@ -66,7 +63,7 @@ while run:
         if dispara:
             cotton.actualizarAccion(2)  # 2: disparar
             cotton.disparar()
-            grupoBalas.add(cotton.disparar())
+            # grupoBalas.add(cotton.disparar())
         elif cotton.enAire:
             cotton.actualizarAccion(4)  # 4: saltar
 
@@ -76,10 +73,12 @@ while run:
             cotton.actualizarAccion(0)  # 0: base
 
     # Actualización del jugador
-    cotton.actualizarAnimacion()
+    cotton.update()
     cotton.mover(izquierda, derecha)
     cotton.aplicarGravedad()
-
+    enemigo.aplicarGravedad()
+    enemigo.mostrar()
+    enemigo.update()
     # Muestra al jugador
     cotton.mostrar()
 
