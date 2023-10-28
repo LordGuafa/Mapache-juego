@@ -1,7 +1,10 @@
 import pygame
 import opciones as opt
 import pantalla as pan
+import background as bg
 import os
+from bala import Bala
+
 
 
 class Entidad(pygame.sprite.Sprite):
@@ -10,8 +13,6 @@ class Entidad(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.vivo = True
         # Atributos del jugador
-        self.salud = 100
-        self.saludMax = self.salud
         self.contBalas = 0
         self.contSaltos = 0
         self.tipo = tipo
@@ -96,10 +97,7 @@ class Entidad(pygame.sprite.Sprite):
             self.indiceFrame += 1
     # Reinicia la animación
         if self.indiceFrame >= len(self.listaAnimacion[self.accion]):
-            if self.accion == 3:
-                self.indiceFrame = len(self.listaAnimacion[self.accion])-1
-            else:
-                self.indiceFrame = 0
+            self.indiceFrame = 0
 
     def actualizarAccion(self, nuevaAccion):
         if nuevaAccion != self.accion:
@@ -108,36 +106,38 @@ class Entidad(pygame.sprite.Sprite):
             self.tiempoActual = pygame.time.get_ticks()
 
     # Método para aplicar la gravedad al jugador
-    def aplicarGravedad(self):
-        if self.rect.y < opt.SCREEN_HEIGHT - self.rect.height:
+    def aplicarGravedad(self, altura_suelo):
+        if self.rect.y < opt.SCREEN_HEIGHT - bg.altura_suelo - self.rect.height:
             self.velocidad_salto += opt.GRAVEDAD
             self.rect.y += self.velocidad_salto
 
         else:
             self.velocidad_salto = 0
-            self.rect.y = opt.SCREEN_HEIGHT - self.rect.height
+            self.rect.y = opt.SCREEN_HEIGHT- bg.altura_suelo - self.rect.height
             self.enAire = False
             self.contSaltos = 0
+    # Método para manejar el salto del jugador
+    # def saltar(self):
+    #     if not self.saltando and self.rect.y == opt.SCREEN_HEIGHT - self.rect.height:
+    #         self.velocidad_salto = -15
+    #         self.saltando = True
 
     # Método para activar el escudo del jugador
-
     def activarEscudo(self):
         if not self.escudo_activado:
             self.escudo_activado = True
             self.escudo_tiempo = 300  # Ajusta la duración del escudo según sea necesario
 
-    def disparar(self):
+    def disparar(self) -> Bala:
         """La entidad dispara
         Returns:
             Bala: Bala que es alojada en el grupo del main
         """
-        if self.contBalas == 0:
-            self.contBalas = 20
-            bala = Bala(self.rect.centerx + (0.6*self.rect.size[0]*self.direccion),
-                        self.rect.centery, self.direccion)
-            grupoBalas.add(bala)
-    # Método para mostrar al jugador en la pantalla
+        bala = Bala(self.rect.centerx + (0.6*self.rect.size[0]*self.direccion),
+                    self.rect.centery, self.direccion)
+        return bala
 
+    # Método para mostrar al jugador en la pantalla
     def mostrar(self):
         # Dibuja el escudo si está activado
         if self.escudo_activado:
@@ -157,49 +157,8 @@ class Entidad(pygame.sprite.Sprite):
                              (10, 25, escudo_length, 10))
 
     def update(self):
-        # Verifica los estados
         self.actualizarAnimacion()
-        self.checkVida()
+
         # Actualiza cooldown
         if self.contBalas > 0:
             self.contBalas -= 1
-
-    def checkVida(self):
-        # Verifica si la entidad sigue con vida
-        if self.vida <= 0:
-            self.vida = 0
-            self.velocidad = 0
-            self.vivo = False
-            self.actualizarAccion(3)
-
-
-imgBala = pygame.image.load('img\Balas/Cotton/0.png').convert_alpha()
-imgBala = pygame.transform.scale(
-    imgBala, ((imgBala.get_width() * opt.ESCALA), (imgBala.get_height() * opt.ESCALA)))
-
-# Carga imágenes
-
-# Creación de grupos de balas
-grupoBalas = pygame.sprite.Group()
-
-
-class Bala(pygame.sprite.Sprite):
-    def __init__(self, x, y, direccion):
-        pygame.sprite.Sprite.__init__(self)
-        self.velocidad = 10
-        self.image = imgBala
-        self.rect = self.image.get_rect()
-        self.rect.center = (x, y)
-        self.direccion = direccion
-
-    def update(self):
-        # Mueve la bala
-        self.rect.x += (self.direccion*self.velocidad)
-
-        # Verifica que la si la bala sale de la pantalla
-        if self.rect.right < 0 or self.rect.left > opt.SCREEN_WIDTH:
-            self.kill()
-        # No he podido parametrizar que @Entidad sea un objeto ya instanciado
-        # if pygame.sprite.spritecollide(Entidad, grupoBalas, False):
-        #     if Entidad.alive:
-        #         self.kill()

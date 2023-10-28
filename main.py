@@ -2,11 +2,10 @@ import pygame
 import pantalla as pan
 import opciones as opt
 from entidades import Entidad
-from entidades import grupoBalas as grupoBalas
 import background as bg
-# from cotton import Cotton
+from bala import Bala
+# from cotton import Cottonw
 pygame.init()
-
 
 pygame.display.set_caption('Mapache-juego')
 
@@ -14,26 +13,28 @@ pygame.display.set_caption('Mapache-juego')
 izquierda = False
 derecha = False
 dispara = False
-
-
 # Configuración del reloj y FPS
 clock = pygame.time.Clock()
 
 
+# Creación de grupos de balas
+grupoBalas = pygame.sprite.Group()
+
+
 # Creación del jugador
 cotton = Entidad('Cotton')
-enemigo = Entidad('Chocoso')
+
 
 # Bucle principal del juego
 run = True
 while run:
     clock.tick(opt.FPS)
+    
     bg.Background()
-
     # Actualiza y muestra los grupos
     grupoBalas.update()
     grupoBalas.draw(pan.screen)
-
+    
     # Manejo de eventos
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -63,7 +64,7 @@ while run:
         if dispara:
             cotton.actualizarAccion(2)  # 2: disparar
             cotton.disparar()
-            # grupoBalas.add(cotton.disparar())
+            grupoBalas.add(cotton.disparar())
         elif cotton.enAire:
             cotton.actualizarAccion(4)  # 4: saltar
 
@@ -73,17 +74,21 @@ while run:
             cotton.actualizarAccion(0)  # 0: base
 
     # Actualización del jugador
-    cotton.update()
+    cotton.actualizarAnimacion()
     cotton.mover(izquierda, derecha)
-    cotton.aplicarGravedad()
-    enemigo.aplicarGravedad()
-    enemigo.mostrar()
-    enemigo.update()
+    cotton.aplicarGravedad(bg.altura_suelo)
+
+
+
     # Muestra al jugador
     cotton.mostrar()
+    
+
+
 
     # Actualización de la pantalla
     pygame.display.update()
 
 # Cierre del juego
+
 pygame.quit()

@@ -1,6 +1,7 @@
 from entidades import Entidad
 import pantalla as pan
 import opciones as opt
+import background as bg
 import pygame
 
 
@@ -25,7 +26,7 @@ class Cotton (Entidad):
             x1 = self.velocidad
 
         # Lógica de salto
-        if self.saltando and self.rect.y == opt.SCREEN_HEIGHT - self.rect.height:
+        if self.saltando and self.rect.y == opt.SCREEN_HEIGHT - bg.altura_suelo - self.rect.height:
             y1 = self.velocidad_salto
             self.saltando = False
 
